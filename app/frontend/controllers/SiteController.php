@@ -15,6 +15,7 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use common\models\TranslatorInfo;
 
 /**
  * Site controller
@@ -75,7 +76,32 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $model = new TranslatorInfo();
+        if ($model->load(Yii::$app->request->post())) {
+            
+            // для демонстрации запроса сохранения данных
+            /*$command = Yii::$app->db->createCommand()->insert('table', $model->getAttributes());
+            var_dump($command->rawSql); exit;*/
+            
+            
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Информация о переводчике добавлена');
+            }
+        }
+        return $this->render('index', [
+            'model' => $model,
+         ]);
+    }
+    
+    public function actionList()
+    {
+        // для демонстрации запроса на выборку данных
+        //var_dump(TranslatorInfo::find()->createCommand()->rawSql); exit; // все записи
+        //var_dump(TranslatorInfo::find()->where(['is_weekend' => 1])->createCommand()->rawSql); exit; // те, кто в выходные работает
+        
+        return $this->render('list', [
+            'itemsJson' => json_encode(TranslatorInfo::find()->asArray()->all()),
+         ]);
     }
 
     /**
